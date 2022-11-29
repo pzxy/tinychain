@@ -3,6 +3,8 @@ mod genesis;
 mod state;
 mod tx;
 
+use std::path::PathBuf;
+
 pub use block::*;
 pub use genesis::*;
 pub use state::*;
@@ -15,17 +17,17 @@ static GENESIS_PATH: OnceCell<String> = OnceCell::new();
 static BLOCKDB_PATH: OnceCell<String> = OnceCell::new();
 
 pub fn init_database_dir(datadir: &str) {
-    let mut dir = datadir.to_owned();
-    dir.push_str("database/");
+    let mut dir = PathBuf::from(datadir);
+    dir.push("database/");
 
     let mut genesis_path = dir.clone();
-    let mut blockdb_path = genesis_path.clone();
-    genesis_path.push_str("genesis.json");
-    blockdb_path.push_str("block.db");
+    let mut blockdb_path = dir.clone();
+    genesis_path.push("genesis.json");
+    blockdb_path.push("block.db");
 
-    DATABASE_DIR.get_or_init(|| dir);
-    GENESIS_PATH.get_or_init(|| genesis_path);
-    BLOCKDB_PATH.get_or_init(|| blockdb_path);
+    DATABASE_DIR.get_or_init(|| dir.into_os_string().into_string().unwrap());
+    GENESIS_PATH.get_or_init(|| genesis_path.into_os_string().into_string().unwrap());
+    BLOCKDB_PATH.get_or_init(|| blockdb_path.into_os_string().into_string().unwrap());
 }
 
 #[cfg(test)]

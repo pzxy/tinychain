@@ -2,16 +2,15 @@ use anyhow::Result;
 use ethers_core::{rand::thread_rng, types::Signature, utils::hash_message};
 use ethers_signers::{LocalWallet, Signer};
 use once_cell::sync::OnceCell;
-use std::{fs, str::FromStr};
+use std::{fs, str::FromStr, path::PathBuf};
 
 const PASSWORD: &str = "774411";
 static KEYSTORE_DIR: OnceCell<String> = OnceCell::new();
 
 pub fn init_keystore_dir(datadir: &str) {
-    let mut dir = datadir.to_owned();
-    dir.push_str("keystore/");
-
-    KEYSTORE_DIR.get_or_init(|| dir);
+    let mut dir = PathBuf::from(datadir);
+    dir.push("keystore/");
+    KEYSTORE_DIR.get_or_init(||dir.into_os_string().into_string().unwrap());
 }
 
 pub fn new_account() -> Result<String> {
